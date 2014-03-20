@@ -101,6 +101,11 @@ GameManager.prototype.moveTile = function (tile, cell) {
 
 // Move tiles on the grid in the specified direction
 GameManager.prototype.move = function (direction) {
+    // MY CHEAT!!!!!!!
+    if (direction == 4) {
+        this.cheat();
+        return;
+    }
   // 0: up, 1: right, 2:down, 3: left
   var self = this;
 
@@ -161,6 +166,52 @@ GameManager.prototype.move = function (direction) {
 
     this.actuate();
   }
+};
+
+GameManager.prototype.cheat = function () {
+    console.log("cheating yo");
+    var self = this;
+    // does not matter
+    var traversals = this.buildTraversals({ x: 0, y: 1 });
+
+    // Save the current tile positions and remove merger information
+    this.prepareTiles();
+
+    // Find tile with biggest value
+    var largest_val = 0;
+    var largest_x = -1;
+    var largest_y = -1;
+    
+    traversals.x.forEach(function (x) {
+        traversals.y.forEach(function (y) {
+            cell = { x: x, y: y };
+            tile = self.grid.cellContent(cell);
+
+            if (tile) {
+                if ((largest_x == -1 && largest_y == -1) || tile.value > largest_val) {
+                    largest_val = tile.value;
+                    largest_x = x;
+                    largest_y = y;
+                }
+            }
+        });
+    });
+
+    // removing all tiles except for the biggest
+    traversals.x.forEach(function (x) {
+        traversals.y.forEach(function (y) {
+            cell = { x: x, y: y };
+            tile = self.grid.cellContent(cell);
+
+            if (tile) {
+                if (x != largest_x || y != largest_y) {
+                    self.grid.removeTile(tile);
+                }
+            }
+        });
+    });
+
+    this.actuate();
 };
 
 // Get the vector representing the chosen direction
